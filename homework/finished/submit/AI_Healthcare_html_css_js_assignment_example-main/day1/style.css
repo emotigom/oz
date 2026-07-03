@@ -1,0 +1,42 @@
+.contents {
+  text-align: center;
+  font-family: "Times New Roman", Times, serif;
+}
+#github {
+  font-size: 15px;
+  text-decoration: none;
+  margin: 20px;
+}
+
+#github:hover {
+  font-size: 20px;
+  text-decoration: underline;
+}
+.box {
+  background-color: lightblue;
+  border: 1px solid black;
+  padding: 50px;
+  margin: 20px;
+}
+#name {
+  background-color: lightblue;
+  border: 1px solid black;
+  padding: 50px;
+  margin: 20px;
+}
+#box1 {
+  background-color: lightgreen;
+  border: 1px solid black;
+  padding: 50px;
+  margin: 20px;
+}
+main {
+  background-color: lightgreen;
+  border: 1px solid black;
+  padding: 50px;
+  margin: 20px;
+  margin-bottom: 150px;
+}
+footer {
+  font-size: xx-small;
+}
