@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>암호화폐 가격변동 추적기</title>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+
+      input {
+        padding: 8px;
+        width: 250px;
+        margin-bottom: 10px;
+      }
+
+      button {
+        padding: 6px 10px;
+        margin: 3px;
+        cursor: pointer;
+      }
+
+      .active {
+        font-weight: bold;
+        background-color: #ddd;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 10px;
+      }
+
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+      }
+
+      .up {
+        color: red;
+      }
+
+      .down {
+        color: blue;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>암호화폐 가격변동 추적기</h1>
+
+    <input type="text" id="searchInput" placeholder="코인 검색 예: BTC, ETH" />
+
+    <br />
+
+    <button id="allTab" class="active">전체보기</button>
+    <button id="favoriteTab">관심항목 보기</button>
+
+    <p id="status">데이터 불러오는 중...</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>관심</th>
+          <th>심볼</th>
+          <th>현재가</th>
+          <th>24시간 변동률</th>
+          <th>24시간 거래량</th>
+        </tr>
+      </thead>
+      <tbody id="coinList"></tbody>
+    </table>
+
+    <script>
+      var API_URL = "https://api4.binance.com/api/v3/ticker/24hr";
+
+      var coins = [];
+      var currentTab = "all";
+
+      var searchInput = document.getElementById("searchInput");
+      var coinList = document.getElementById("coinList");
+      var statusText = document.getElementById("status");
+
+      var allTab = document.getElementById("allTab");
+      var favoriteTab = document.getElementById("favoriteTab");
+
+      var favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+
+      function saveFavorites() {
+        localStorage.setItem("favorites", JSON.stringify(favorites));
+      }
+
+      function isFavorite(symbol) {
+        return favorites.indexOf(symbol) !== -1;
+      }
+
+      function toggleFavorite(symbol) {
+        if (isFavorite(symbol)) {
+          favorites = favorites.filter(function (item) {
+            return item !== symbol;
+          });
+        } else {
+          favorites.push(symbol);
+        }
+
+        saveFavorites();
+        renderCoins();
+      }
+
+      function fetchCoins() {
+        fetch(API_URL)
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (data) {
+            coins = data.filter(function (item) {
+              return item.symbol.endsWith("USDT");
+            });
+
+            renderCoins();
+
+            var now = new Date();
+            statusText.innerText =
+              "마지막 업데이트: " + now.toLocaleTimeString();
+          })
+          .catch(function (error) {
+            console.log(error);
+            statusText.innerText = "데이터를 불러오지 못했습니다.";
+          });
+      }
+
+      function renderCoins() {
+        var keyword = searchInput.value.toUpperCase();
+
+        var filteredCoins = coins.filter(function (coin) {
+          var symbolMatch = coin.symbol.indexOf(keyword) !== -1;
+
+          if (currentTab === "favorite") {
+            return symbolMatch && isFavorite(coin.symbol);
+          }
+
+          return symbolMatch;
+        });
+
+        coinList.innerHTML = "";
+
+        filteredCoins.forEach(function (coin) {
+          var tr = document.createElement("tr");
+
+          var changePercent = Number(coin.priceChangePercent);
+          var changeClass = "";
+
+          if (changePercent > 0) {
+            changeClass = "up";
+          } else if (changePercent < 0) {
+            changeClass = "down";
+          }
+
+          var favoriteButtonText = "☆";
+
+          if (isFavorite(coin.symbol)) {
+            favoriteButtonText = "★";
+          }
+
+          tr.innerHTML =
+            "<td><button onclick=\"toggleFavorite('" +
+            coin.symbol +
+            "')\">" +
+            favoriteButtonText +
+            "</button></td>" +
+            "<td>" +
+            coin.symbol +
+            "</td>" +
+            "<td>" +
+            Number(coin.lastPrice).toLocaleString() +
+            "</td>" +
+            "<td class='" +
+            changeClass +
+            "'>" +
+            changePercent.toFixed(2) +
+            "%</td>" +
+            "<td>" +
+            Number(coin.volume).toLocaleString() +
+            "</td>";
+
+          coinList.appendChild(tr);
+        });
+      }
+
+      searchInput.addEventListener("input", function () {
+        renderCoins();
+      });
+
+      allTab.addEventListener("click", function () {
+        currentTab = "all";
+
+        allTab.classList.add("active");
+        favoriteTab.classList.remove("active");
+
+        renderCoins();
+      });
+
+      favoriteTab.addEventListener("click", function () {
+        currentTab = "favorite";
+
+        favoriteTab.classList.add("active");
+        allTab.classList.remove("active");
+
+        renderCoins();
+      });
+
+      fetchCoins();
+
+      setInterval(function () {
+        fetchCoins();
+      }, 1000);
+    </script>
+  </body>
+</html>

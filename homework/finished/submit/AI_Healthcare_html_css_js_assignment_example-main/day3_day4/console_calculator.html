@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>콘솔창 계산기 프로그램</h1>
+    <hr />
+    <h2>Window OS의 경우</h2>
+    <p>1. F12 키를 눌러 콘솔 창을 여세요.</p>
+    <p>2. start()를 콘솔창에 입력하여 계산기를 실행합니다.</p>
+    <h2>Mac OS의 경우</h2>
+    <hr />
+    <p>1. Command + Option + J 키를 눌러 콘솔 창을 여세요.</p>
+    <p>2. start()를 콘솔창에 입력하여 계산기를 실행합니다</p>
+    <script>
+      function start() {
+        alert("콘솔창 계산기를 시작합니다!");
+
+        while (true) {
+          let input = prompt(
+            "계산하고 싶은 수식을 입력하세요:\n(그만하려면 '종료'를 입력하거나 취소 버튼을 누르세요)",
+          );
+
+          if (input === null || input === "종료") {
+            console.log("계산기가 종료되었습니다. 이용해 주셔서 감사합니다!");
+            alert("계산기를 종료합니다.");
+            break;
+          }
+
+          if (input.trim() === "") {
+            alert("아무것도 입력하지 않으셨어요. 수식을 입력해 주세요!");
+            continue;
+          }
+
+          try {
+            // [변경 사항] eval() 대신 더 안전한 Function 생성자 사용
+            // 입력된 수식을 실행하여 결과값을 반환하는 새로운 안전한 함수를 만듭니다.
+            let calcFunction = new Function("return " + input);
+            let result = calcFunction();
+
+            // 결과가 숫자가 아니거나 오류가 있는 경우 처리 (예: abc 입력 시)
+            if (result === undefined || isNaN(result)) {
+              throw new Error("올바르지 않은 수식");
+            }
+
+            console.log("입력한 식: " + input + " -> 결과: " + result);
+            alert("정답은 " + result + " 입니다!");
+          } catch (error) {
+            console.log("계산 에러 발생: " + input);
+            alert(
+              "수식이 올바르지 않습니다. (예: 2 + 3 * 4 처럼 입력해 주세요)",
+            );
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

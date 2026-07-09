@@ -1,3 +1,12 @@
+function appendNumber(number) {
+    const display = document.getElementById("display");
+    if (display.value === "0" && number !== ".") {
+        display.value = number;
+    } else {
+        display.value += number;
+    }
+}
+
 function add(a, b) {
     return a + b;
 }
@@ -20,6 +29,12 @@ function inputFormula() {
 
 function calculate(formula) {
     const tokens = formula.trim().split(/\s+/);
+
+    // 단일 숫자만 입력된 경우 예외 처리
+    if (tokens.length === 1 && !isNaN(tokens[0])) {
+        return tokens[0];
+    }
+
     if (tokens.length < 3 || tokens.length % 2 === 0) {
         return "잘못된 계산식이 입력되었습니다.";
     }
@@ -74,12 +89,11 @@ function calculate(formula) {
 
 function start(formula) {
     let input = formula;
-    
-    // 인자가 없으면 prompt로 물어봄
+
     if (!input) {
         input = inputFormula();
     }
-    
+
     if (!input) {
         console.log("계산식을 입력해주세요.");
         return;
