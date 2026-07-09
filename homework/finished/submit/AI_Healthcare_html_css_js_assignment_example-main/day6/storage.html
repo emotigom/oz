@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <input type="text" placeholder="이름 입력" />
+
+    <button id="saveButton">저장</button>
+    <button id="deleteButton">삭제</button>
+    <p></p>
+    <script>
+      const input = document.querySelector("input");
+      const button = document.querySelector("button");
+      const saveButton = document.querySelector("#saveButton");
+      const deleteButton = document.querySelector("#deleteButton");
+
+      const p = document.querySelector("p");
+
+function welcomeText(name) {
+    return `환영합니다, ${name}님!`;
+}
+const savedName = sessionStorage.getItem("name");
+p.textContent = welcomeText(savedName);
+
+      saveButton.addEventListener("click", () => {
+        sessionStorage.setItem("name", input.value);
+        p.textContent = `저장된 이름: ${sessionStorage.getItem("name")}`;
+      });
+
+      deleteButton.addEventListener("click", () => {
+        sessionStorage.removeItem("name");
+        p.textContent = "저장된 이름이 삭제되었습니다.";
+        p.tabIndex = -1;
+    });
+    </script>
+  </body>
+</html>
